@@ -1,9 +1,8 @@
 {
-    "redirects": [
+    "rewrites": [
       {
         "source": "/tutorial/:path*",
-        "destination": "https://yew.rs/tutorial/:path*",
-        "permanent": false
+        "destination": "https://yew.rs/tutorial/:path*"
       }
     ]
 }
