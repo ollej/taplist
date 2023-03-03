@@ -1,0 +1,13 @@
+[package]
+name = "taplist"
+version = "1.0.0"
+authors = ["Olle Wreede <olle@wreede.se>"]
+edition = "2021"
+
+[dependencies]
+http = "0.1"
+vercel_lambda = "*"
+
+#[lib]
+#name = "util"
+#path = "_util.rs"

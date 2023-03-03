@@ -9,6 +9,12 @@ rustup target add wasm32-unknown-unknown
 cargo install trunk wasm-bindgen-cli
 ```
 
+### For Mac silicon
+
+```sh
+rustup override set stable-x86_64-apple-darwin
+```
+
 ## Development
 
 ```sh
