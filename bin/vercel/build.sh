@@ -2,4 +2,5 @@
 
 PATH=$PATH:/vercel/.cargo/bin
 
+cd frontend
 trunk build --release
