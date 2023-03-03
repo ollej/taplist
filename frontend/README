@@ -1,0 +1,22 @@
+# taplist
+
+A small mobile web app to display a list of beers.
+
+## Installation
+
+```sh
+rustup target add wasm32-unknown-unknown
+cargo install trunk wasm-bindgen-cli
+```
+
+## Development
+
+```sh
+trunk serve --proxy-backend=https://yew.rs/tutorial
+```
+
+## Release
+
+```sh
+trunk build --release
+```
