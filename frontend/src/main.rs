@@ -1,6 +1,15 @@
 use gloo_net::http::Request;
 use serde::Deserialize;
+use wasm_bindgen::prelude::*;
+use wasm_bindgen_futures::spawn_local;
+use web_sys::window;
 use yew::prelude::*;
+
+#[wasm_bindgen(module = "/public/glue.js")]
+extern "C" {
+    #[wasm_bindgen(js_name = invokeHello, catch)]
+    pub async fn hello(name: String) -> Result<JsValue, JsValue>;
+}
 
 #[derive(Clone, PartialEq, Deserialize)]
 struct Video {
@@ -48,8 +57,45 @@ fn video_details(VideosDetailsProps { video }: &VideosDetailsProps) -> Html {
     }
 }
 
+fn update_welcome_message(welcome: UseStateHandle<String>, name: String) {
+    spawn_local(async move {
+        // This will call our glue code all the way through to the tauri
+        // back-end command and return the `Result<String, String>` as
+        // `Result<JsValue, JsValue>`.
+        match hello(name).await {
+            Ok(message) => {
+                welcome.set(message.as_string().unwrap());
+            }
+            Err(e) => {
+                let window = window().unwrap();
+                window
+                    .alert_with_message(&format!("Error: {:?}", e))
+                    .unwrap();
+            }
+        }
+    });
+}
+
 #[function_component(App)]
 fn app() -> Html {
+    let welcome = use_state_eq(|| "".to_string());
+    let name = use_state_eq(|| "World".to_string());
+
+    // Execute tauri command via effects.
+    // The effect will run every time `name` changes.
+    {
+        let welcome = welcome.clone();
+        use_effect_with_deps(
+            move |name| {
+                update_welcome_message(welcome, name.clone());
+                || ()
+            },
+            (*name).clone(),
+        );
+    }
+
+    let message = (*welcome).clone();
+
     let videos = use_state(|| vec![]);
     {
         let videos = videos.clone();
@@ -88,6 +134,9 @@ fn app() -> Html {
     html! {
     <>
         <h1>{ "RustConf Explorer" }</h1>
+        <div>
+            <h2 class={"heading"}>{message}</h2>
+        </div>
         <div>
             <h3>{"Videos to watch"}</h3>
             <VideosList videos={(*videos).clone()} on_click={on_video_select.clone()} />
